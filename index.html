@@ -52,7 +52,7 @@
     </header>
 
     <!-- Основной контейнер -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+    <main class="max-w-full mx-auto px-2 sm:px-4 lg:px-6 py-8 flex-grow w-full">
         <!-- Превью -->
         <div
             class="mb-8 p-6 rounded-2xl bg-gradient-to-r from-brand-card via-brand-card to-brand-blue/20 border border-slate-800 relative overflow-hidden">
@@ -61,7 +61,7 @@
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight">
                 Расчет экономической эффективности от внедрения тренажерных средств обучения (ТСО)
             </h1>
-            <p class="text-brand-slate text-sm sm:text-base max-w-3xl leading-relaxed">
+            <p class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">
                 Введите технологические и финансовые параметры вашего энергоблока в левой панели.
                 Калькулятор рассчитает экономические эффекты от подготовки операторов энергоблока на тренажере
                 объекта-прототипа,
@@ -70,10 +70,10 @@
         </div>
 
         <!-- 3 колонки -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
 
             <!-- Вводные данные -->
-            <section class="lg:col-span-4 bg-brand-card border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <section class="lg:col-span-2 bg-brand-card border border-slate-800 rounded-2xl p-6 shadow-xl h-full">
                 <div class="flex items-center space-x-2 pb-4 mb-6 border-b border-slate-800">
                     <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,46 +84,45 @@
 
                 <form id="calc-form" class="space-y-4 text-xs sm:text-sm"
                     onsubmit="event.preventDefault(); calculate();">
-                    <!-- 1. Доля аварийных остановов по вине персонала -->
+                    <!-- Доля аварийных остановов по вине персонала -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="emergency-share">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="emergency-share">
                             Доля аварийных остановов по вине персонала
                         </label>
                         <input type="number" id="emergency-share" value="0.4" min="0" max="1" step="0.1"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 2. Установленная мощность блока -->
+                    <!-- Установленная мощность блока -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="capacity">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="capacity">
                             Установленная мощность блока, МВт
                         </label>
                         <input type="number" id="capacity" value="200" min="1" step="100"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 3. Тарифная ставка за электроэнергию -->
+                    <!-- Тарифная ставка за электроэнергию -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="tariff">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="tariff">
                             Тарифная ставка за электроэнергию, руб/(МВт*ч)
                         </label>
                         <input type="number" id="tariff" value="1486.04" min="0" step="100"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 4. Среднегодовое количество аварийных остановов блока по вине персонала -->
+                    <!-- Среднегодовое количество аварийных остановов блока по вине персонала -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="annual-emergencies">
-                            Среднегодовое количество аварийных
-                            остановов блока по вине персонала
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="annual-emergencies">
+                            Среднегодовое количество аварийных остановов блока по вине персонала
                         </label>
                         <input type="number" id="annual-emergencies" value="2" min="0" step="1"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 5. Вид топлива -->
+                    <!-- Вид топлива -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="fuel-type">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="fuel-type">
                             Вид топлива
                         </label>
                         <select id="fuel-type"
@@ -134,45 +133,45 @@
                         </select>
                     </div>
 
-                    <!-- 6. Ставка налога на прибыль -->
+                    <!-- Ставка налога на прибыль -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="tax-rate">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="tax-rate">
                             Ставка налога на прибыль
                         </label>
                         <input type="number" id="tax-rate" value="0.25" min="0" max="1" step="0.1"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 7. Ставка дисконта -->
+                    <!-- Ставка дисконта -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="discount-rate">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="discount-rate">
                             Ставка дисконта, %
                         </label>
                         <input type="number" id="discount-rate" value="15" min="0" max="100" step="10"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 8. Процент на последующие эксплуатационные затраты -->
+                    <!-- Процент на последующие эксплуатационные затраты -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="operating-cost-pct">
-                            Процент на последующие эксплуатационные затраты (% от разработки)
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="operating-cost-pct">
+                            Процент на последующие эксплуатационные затраты, % от разработки
                         </label>
                         <input type="number" id="operating-cost-pct" value="10" min="0" max="100" step="10"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 9. Расчетный период -->
+                    <!-- Расчетный период -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="calc-period">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="calc-period">
                             Расчетный период, лет
                         </label>
                         <input type="number" id="calc-period" value="10" min="1" max="15" step="1"
                             class="w-full bg-brand-dark/50 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
-                    <!-- 10. Жизненный цикл тренажера -->
+                    <!-- Жизненный цикл тренажера -->
                     <div>
-                        <label class="block text-slate-300 font-medium mb-1.5" for="lifespan">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="lifespan">
                             Жизненный цикл тренажера, лет
                         </label>
                         <input type="number" id="lifespan" value="10" min="1" step="1"
@@ -191,7 +190,7 @@
                     </button>
 
                     <button type="button" onclick="resetDefaults()"
-                        class="w-full text-xs text-brand-slate hover:text-white transition py-1 text-center">
+                        class="mt-6 w-full text-xs text-brand-slate hover:text-white transition py-1 text-center">
                         Сбросить к исходным значениям
                     </button>
                 </form>
@@ -199,7 +198,7 @@
 
             <!-- Выводимые показатели -->
             <section
-                class="lg:col-span-4 bg-brand-card border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between h-full">
+                class="lg:col-span-1 bg-brand-card border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between h-full">
                 <div>
                     <div class="flex items-center space-x-2 pb-4 mb-6 border-b border-slate-800">
                         <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,7 +212,7 @@
                         <!-- Снижение затрат на восстановительный ремонт оборудования -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Снижение затрат на восстановительный ремонт оборудования</span>
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Снижение затрат на восстановительный ремонт оборудования</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-1">—</span>
                             </div>
                             <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
@@ -225,7 +224,7 @@
                         <!-- Экономия топлива на пуски блока -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Экономия топлива на пуски
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Экономия топлива на пуски
                                     блока</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-2">—</span>
                             </div>
@@ -238,7 +237,7 @@
                         <!-- Экономия химобессоленной воды -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Экономия химобессоленной воды</span>
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Экономия химобессоленной воды</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-3">—</span>
                             </div>
                             <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
@@ -250,7 +249,7 @@
                         <!-- Экономия электроэнергии, расходуемой при пуске энергоблока -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Экономия электроэнергии, расходуемой при пуске энергоблока</span>
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Экономия электроэнергии, расходуемой при пуске энергоблока</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-4">—</span>
                             </div>
                             <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
@@ -262,7 +261,7 @@
                         <!-- Экономия топлива вследствие использования возможностей оптимизации режимов эксплуатации энергоблока -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Экономия топлива вследствие использования возможностей оптимизации режимов эксплуатации энергоблока</span>
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Экономия топлива вследствие использования возможностей оптимизации режимов эксплуатации энергоблока</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-5">—</span>
                             </div>
                             <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
@@ -274,7 +273,7 @@
                         <!-- Снижение затрат на плановый ремонт оборудования -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Снижение затрат на плановый ремонт оборудования</span>
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Снижение затрат на плановый ремонт оборудования</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-6">—</span>
                             </div>
                             <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
@@ -286,7 +285,7 @@
                         <!-- Снижение потери прибыли от снижения отпуска электроэнергии -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Снижение потери прибыли от снижения отпуска электроэнергии</span>
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Снижение потери прибыли от снижения отпуска электроэнергии</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-7">—</span>
                             </div>
                             <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
@@ -298,7 +297,7 @@
                         <!-- Экономия на плате за отклонения -->
                         <div class="p-3 bg-brand-dark/40 border border-slate-800 rounded-xl">
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs text-slate-300 leading-tight">Экономия на плате за
+                                <span class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed">Экономия на плате за
                                     отклонения</span>
                                 <span class="text-sm font-bold text-white whitespace-nowrap ml-2" id="val-8">—</span>
                             </div>
@@ -319,7 +318,7 @@
             </section>
 
             <!-- Правая панель -->
-            <section class="lg:col-span-4 space-y-6">
+            <section class="lg:col-span-2 space-y-6 h-full">
                 <!-- Срок окупаемости -->
                 <div class="bg-brand-card border border-slate-800 rounded-2xl p-6 shadow-xl grid grid-cols-1 gap-4">
                     <div class="p-3 bg-brand-dark/50 border border-slate-800 rounded-xl text-center">
@@ -336,7 +335,7 @@
                         <span>Накопленный дисконтированный поток</span>
                         <span class="text-[10px] text-brand-accent normal-case font-medium">тыс. руб</span>
                     </h3>
-                    <div class="h-48 w-full relative">
+                    <div class="h-96 w-full relative">
                         <canvas id="cumulativeChart"></canvas>
                     </div>
                 </div>
@@ -348,7 +347,7 @@
                         <span>Удельный экономический эффект</span>
                         <span class="text-[10px] text-brand-accent normal-case font-medium">руб/(год*МВт)</span>
                     </h3>
-                    <div class="h-48 w-full relative">
+                    <div class="h-96 w-full relative">
                         <canvas id="cumulativeChart"></canvas>
                     </div>
                 </div>
@@ -359,7 +358,7 @@
         <!-- Таблица дисконтированных потоков -->
         <section class="mt-8 bg-brand-card border border-slate-800 rounded-2xl p-6 shadow-xl overflow-hidden">
             <div
-                class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-slate-800 gap-4">
+                class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 gap-4">
                 <div class="flex items-center space-x-2">
                     <svg class="w-5 h-5 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -379,13 +378,13 @@
                 <table class="w-full text-left border-collapse text-[11px] sm:text-xs">
                     <thead>
                         <tr
-                            class="border-b border-slate-800 text-brand-slate uppercase font-semibold text-[10px] tracking-wider">
-                            <th class="py-3 px-4">Год</th>
-                            <th class="py-3 px-4 text-right">Коэффициент дисконтирования</th>
-                            <th class="py-3 px-4 text-right">Дисконтированный отток</th>
-                            <th class="py-3 px-4 text-right">Дисконтированный приток</th>
-                            <th class="py-3 px-4 text-right">Приведенный дисконтированный поток</th>
-                            <th class="py-3 px-4 text-right">Накопленный дисконтированный поток</th>
+                            class="border-y border-slate-800 text-brand-slate uppercase font-semibold text-[10px] tracking-wider">
+                            <th class="py-4 px-4 align-middle">Год</th>
+                            <th class="py-4 px-4 text-right align-middle">Коэффициент дисконтирования</th>
+                            <th class="py-4 px-4 text-right align-middle">Дисконтированный отток</th>
+                            <th class="py-4 px-4 text-right align-middle">Дисконтированный приток</th>
+                            <th class="py-4 px-4 text-right align-middle">Приведенный дисконтированный поток</th>
+                            <th class="py-4 px-4 text-right align-middle">Накопленный дисконтированный поток</th>
                         </tr>
                     </thead>
                     <tbody id="flow-table-body" class="divide-y divide-slate-800 text-slate-300">
@@ -394,6 +393,15 @@
                 </table>
             </div>
         </section>
+        <button type="submit"
+                        class="w-full mt-6 bg-brand-blue hover:bg-brand-blueHover text-white py-3.5 px-6 rounded-xl font-bold uppercase tracking-wider flex items-center justify-center space-x-2 transition shadow-lg hover:shadow-brand-blue/30 active:scale-[0.98]">
+                        <span>Написать менеджеру</span>
+                        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
     </main>
 
     <!-- FOOTER -->
