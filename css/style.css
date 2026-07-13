@@ -1,5 +1,6 @@
 body {
     font-family: 'Fira Sans', sans-serif;
+    font-size: 16px;
     background-color: #181C2E;
 }
 
@@ -13,10 +14,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: #FFFFFF14;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: #2E51AA;
 }
