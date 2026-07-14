@@ -130,12 +130,10 @@ function calculate() {
     // 6.7 Суммарный экономический эффект
     const totalEffect = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization, 
         cutCostPlan, profitGrowth, cutPayDeviations].reduce((sum, val) => sum + val, 0);
-    
 
-
-
-    // 6.6 Обновление интерфейса с результатами компонентов
-    const values = [val1, val2, val3, val4, val5, val6, val7, val8];
+    // 6.8 Обновление интерфейса с результатами расчета эффектов
+    const values = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization, 
+        cutCostPlan, profitGrowth, cutPayDeviations];
     values.forEach((val, i) => {
         const valElement = document.getElementById(`val-${i + 1}`);
         const barElement = document.getElementById(`bar-${i + 1}`);
@@ -143,17 +141,17 @@ function calculate() {
             valElement.innerText = formatMoney(val);
         }
         if (barElement) {
-            const percentage = (val / totalAnnualSavingsBeforeTax) * 100;
+            const percentage = (val / totalEffect) * 100;
             barElement.style.width = `${percentage}%`;
         }
     });
 
     const totalEffectElement = document.getElementById('total-effect');
     if (totalEffectElement) {
-        totalEffectElement.innerText = formatMoney(totalAnnualSavingsBeforeTax) + ' ₽';
+        totalEffectElement.innerText = formatMoney(totalEffect) + ' ₽';
     }
 
-    // 6.8 Построение таблицы дисконтированных потоков
+    // 6.9 Построение таблицы дисконтированных потоков
     const tableBody = document.getElementById('flow-table-body');
     if (tableBody) {
         tableBody.innerHTML = '';
