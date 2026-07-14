@@ -88,10 +88,10 @@
                     <!-- Доля аварийных остановов по вине персонала -->
                     <div>
                         <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed"
-                            for="emergency-share">
+                            for="emergency-shutdowns">
                             Доля аварийных остановов по вине персонала
                         </label>
-                        <input type="number" id="emergency-share" value="0.4" min="0" max="1" step="0.1"
+                        <input type="number" id="emergency-shutdowns" value="0.4" min="0" max="1" step="0.1"
                             class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
@@ -158,10 +158,10 @@
                     <!-- Процент на последующие эксплуатационные затраты -->
                     <div>
                         <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed"
-                            for="operating-cost-pct">
+                            for="operating-costs">
                             Процент на последующие эксплуатационные затраты, % от разработки
                         </label>
-                        <input type="number" id="operating-cost-pct" value="10" min="0" max="100" step="10"
+                        <input type="number" id="operating-costs" value="10" min="0" max="100" step="10"
                             class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
@@ -171,16 +171,16 @@
                             for="calc-period">
                             Расчетный период, лет
                         </label>
-                        <input type="number" id="calc-period" value="10" min="1" max="15" step="1"
+                        <input type="number" id="calc-period" value="6" min="1" max="15" step="1"
                             class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 
                     <!-- Жизненный цикл тренажера -->
                     <div>
-                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="lifespan">
+                        <label class="text-brand-slate text-sm sm:text-base max-w-full leading-relaxed" for="life-cycle">
                             Жизненный цикл тренажера, лет
                         </label>
-                        <input type="number" id="lifespan" value="10" min="1" step="1"
+                        <input type="number" id="life-cycle" value="10" min="1" step="1"
                             class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
 

@@ -1,5 +1,5 @@
 // 1. Ожидание загрузки DOM
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initCalculator();
 });
 
@@ -26,7 +26,7 @@ function initCalculator() {
 
     // Находим кнопку сброса
     const resetBtn = document.getElementById('reset-btn');
-    
+
     // Вешаем обработчики на все поля (пересчет при изменении)
     for (const key in inputs) {
         const element = inputs[key];
@@ -35,12 +35,12 @@ function initCalculator() {
             element.addEventListener('change', calculate);
         }
     }
-    
+
     // Кнопка сброса
     if (resetBtn) {
         resetBtn.addEventListener('click', resetDefaults);
     }
-    
+
     // Первый расчет при загрузке
     calculate();
 }
@@ -79,49 +79,66 @@ function formatCompact(num) {
 // 6. ОСНОВНАЯ ФУНКЦИЯ РАСЧЕТА
 function calculate() {
     // 6.1 Чтение всех входных данных
-    const emergencyShare = parseFloat(document.getElementById('emergency-share').value) / 100;
+    const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
     const capacity = parseFloat(document.getElementById('capacity').value);
     const tariff = parseFloat(document.getElementById('tariff').value);
-    const annualEmergencies = parseFloat(document.getElementById('annual-emergencies').value);
+    const annualEmergencies = parseInt(document.getElementById('annual-emergencies').value);
     const fuelType = document.getElementById('fuel-type').value;
-    const taxRate = parseFloat(document.getElementById('tax-rate').value) / 100;
+    const taxRate = parseFloat(document.getElementById('tax-rate').value);
     const discountRate = parseFloat(document.getElementById('discount-rate').value) / 100;
-    const operatingCostPct = parseFloat(document.getElementById('operating-cost-pct').value) / 100;
+    const operatingCosts = parseFloat(document.getElementById('operating-costs').value) / 100;
     const calcPeriod = parseInt(document.getElementById('calc-period').value);
-    const lifespan = parseInt(document.getElementById('lifespan').value);
-    const capex = parseFloat(document.getElementById('capex').value);
+    const lifeCycle = parseInt(document.getElementById('life-cycle').value);
 
-    // 6.2 Коэффициент топлива
-    let fuelMultiplier = 1.0;
-    if (fuelType === 'coal') fuelMultiplier = 1.25;
-    else if (fuelType === 'oil') fuelMultiplier = 1.5;
+    // 6.2 Цена топлива
+    let fuelCost = 9700.0;
+    if (fuelType === 'coal') fuelCost = 18000.0;
+    else if (fuelType === 'oil') fuelCost = 36000.0;
 
-    // 6.3 Расчет предотвращенных аварий
-    const preventedEmergencies = annualEmergencies * emergencyShare * 0.8;
+    // 6.3 Расчет затрат на проведение восстановительного ремонта
+    const generationYear = 3062.5 * capacity;
+    const shareRepairTariff = 0.05;
+    const costPlan = generationYear * tariff * shareRepairTariff;
+    const costRenewal = 0.05 * costPlan * annualEmergencies;
 
-    // 6.4 Масштабирующие коэффициенты
-    const scaleCapacity = capacity / 300;
-    const scaleTrips = preventedEmergencies / 2.4;
-    const scaleTariff = tariff / 4.5;
+    // 6.4 Расчет эффектов
+    const cutCostRenewal = annualEmergencies * emergencyShutdowns * costRenewal;
+    const fuelConsumptionStarting = 599.3;
+    const cutFuel = annualEmergencies * emergencyShutdowns * fuelCost * fuelConsumptionStarting;
+    const waterConsumptionStarting = 4000.0;
+    const costWaterTreatment = 57.0;
+    const cutWater = annualEmergencies * emergencyShutdowns * waterConsumptionStarting * costWaterTreatment;
+    const energyConsumptionStarting = 131.8;
+    const fuelConsumption = 0.31;
+    const cutEnergy = annualEmergencies * emergencyShutdowns * energyConsumptionStarting * fuelConsumption * fuelCost;
+    const cutFuelConsumption = 0.0031;
+    const shareCutFuelConsumption = 0.79 * emergencyShutdowns;
+    const cutFuelOptimization = shareCutFuelConsumption * cutFuelConsumption * fuelCost * generationYear;
+    const cutCostPlanMain = 0.17;
+    const cutCostPlan = costPlan * 0.65 * cutCostPlanMain * (1 - emergencyShutdowns);
 
-    // 6.5 Расчет экономических эффектов
-    const val1 = 7500 * scaleTrips * scaleCapacity;
-    const val2 = 9200 * scaleTrips * scaleCapacity * fuelMultiplier;
-    const val3 = 1100 * scaleTrips * scaleCapacity;
-    const val4 = 3400 * scaleTrips * scaleCapacity * scaleTariff;
-    const val5 = 5800 * scaleCapacity * fuelMultiplier;
-    const val6 = 4200 * scaleCapacity;
-    const val7 = 5655.68 * scaleTrips * scaleCapacity * scaleTariff;
-    const val8 = 2300 * scaleTrips * scaleCapacity;
+    // 6.5 Снижение потери прибыли от снижения отпуска электроэнергии
+    const shareFuelTariff = 0.53;
+    const profitGrowth = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * (tariff - shareFuelTariff * tariff) 
+    * (1 - taxRate);
 
-    const totalAnnualSavingsBeforeTax = val1 + val2 + val3 + val4 + val5 + val6 + val7 + val8;
-    const netAnnualInflow = totalAnnualSavingsBeforeTax * (1 - taxRate);
+    // 6.6 Снижение платы за отклонения
+    const maxTariff = 4513.34;
+    const coefPayDeviations = 2.0;
+    const cutPayDeviations = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * maxTariff * coefPayDeviations;
+
+    // 6.7 Суммарный экономический эффект
+    const totalEffect = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization, 
+        cutCostPlan, profitGrowth, cutPayDeviations].reduce((sum, val) => sum + val, 0);
+    
+
+
 
     // 6.6 Обновление интерфейса с результатами компонентов
     const values = [val1, val2, val3, val4, val5, val6, val7, val8];
     values.forEach((val, i) => {
-        const valElement = document.getElementById(`val-${i+1}`);
-        const barElement = document.getElementById(`bar-${i+1}`);
+        const valElement = document.getElementById(`val-${i + 1}`);
+        const barElement = document.getElementById(`bar-${i + 1}`);
         if (valElement) {
             valElement.innerText = formatMoney(val);
         }
@@ -136,14 +153,11 @@ function calculate() {
         totalEffectElement.innerText = formatMoney(totalAnnualSavingsBeforeTax) + ' ₽';
     }
 
-    // 6.7 Расчет операционных расходов
-    const opex = capex * operatingCostPct;
-
     // 6.8 Построение таблицы дисконтированных потоков
     const tableBody = document.getElementById('flow-table-body');
     if (tableBody) {
         tableBody.innerHTML = '';
-        
+
         let cumulativeFlow = 0;
         const chartLabels = [];
         const cumulativeData = [];
@@ -151,7 +165,7 @@ function calculate() {
 
         for (let t = 1; t <= calcPeriod; t++) {
             const discFactor = 1 / Math.pow(1 + discountRate, t);
-            
+
             let outflow = 0;
             let inflow = 0;
 
@@ -179,7 +193,7 @@ function calculate() {
             row.className = "hover:bg-brand-dark/80 transition";
             const flowColor = netDiscountedFlow >= 0 ? 'text-emerald-400' : 'text-red-400';
             const cumColor = cumulativeFlow >= 0 ? 'text-emerald-400' : 'text-red-400';
-            
+
             row.innerHTML = `
                 <td class="py-3 px-4 font-semibold text-white">${t}-год</td>
                 <td class="py-3 px-4 text-right text-slate-400 font-mono">${discFactor.toFixed(6)}</td>
@@ -289,7 +303,7 @@ function updateCharts(labels, cumulativeData, structureValues) {
                         borderColor: '#334155',
                         borderWidth: 1,
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 return ' ' + formatMoney(context.parsed.y) + ' тыс. руб.';
                             }
                         }
