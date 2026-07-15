@@ -11,16 +11,16 @@ let breakdownChartInstance = null;
 function initCalculator() {
     // Находим все элементы ввода
     const inputs = {
-        emergencyShare: document.getElementById('emergency-shutdowns'),
+        emergencyShutdowns: document.getElementById('emergency-shutdowns'),
         capacity: document.getElementById('capacity'),
         tariff: document.getElementById('tariff'),
         annualEmergencies: document.getElementById('annual-emergencies'),
         fuelType: document.getElementById('fuel-type'),
         taxRate: document.getElementById('tax-rate'),
         discountRate: document.getElementById('discount-rate'),
-        operatingCostPct: document.getElementById('operating-costs'),
+        operatingCosts: document.getElementById('operating-costs'),
         calcPeriod: document.getElementById('calc-period'),
-        lifespan: document.getElementById('life-cycle'),
+        lifeCycle: document.getElementById('life-cycle'),
     };
 
     // Находим кнопку сброса
@@ -46,15 +46,15 @@ function initCalculator() {
 
 // 4. Функция сброса к значениям по умолчанию
 function resetDefaults() {
-    document.getElementById('emergency-shutdowns').value = 75;
-    document.getElementById('capacity').value = 300;
-    document.getElementById('tariff').value = 4.50;
-    document.getElementById('annual-emergencies').value = 3.0;
+    document.getElementById('emergency-shutdowns').value = 0.4;
+    document.getElementById('capacity').value = 200;
+    document.getElementById('tariff').value = 1486.04;
+    document.getElementById('annual-emergencies').value = 2;
     document.getElementById('fuel-type').value = 'gas';
-    document.getElementById('tax-rate').value = 20;
+    document.getElementById('tax-rate').value = 0.25;
     document.getElementById('discount-rate').value = 15;
     document.getElementById('operating-costs').value = 10;
-    document.getElementById('calc-period').value = 10;
+    document.getElementById('calc-period').value = 6;
     document.getElementById('life-cycle').value = 10;
     calculate();
 }
@@ -217,22 +217,17 @@ function calculate() {
         }
     }
 
-    // 6.9 Расчет финансовых показателей
-    updateKPIs(cumulativeFlow, cumulativeData, cashFlowsForIRR, discountRate, calcPeriod, capex, opex, annualInflow);
+    // 6.10 Расчет финансовых показателей
+    updateKPIs(cumulativeDiscFlows, discountRate, calcPeriod, capex, opex, annualInflow, capacity, totalEffect, lifeCycle);
 
-    // 6.10 Обновление графиков
-    updateCharts(chartLabels, cumulativeData, values);
+    // 6.11 Обновление графиков
+    const chartLabels = discFactors.map((_, i) => `${i + 1}-год`);
+    updateCharts(chartLabels, cumulativeDiscFlows);
 }
 
 // 7. Функция обновления финансовых показателей
-function updateKPIs(finalNPV, cumulativeData, cashFlowsForIRR, discountRate, calcPeriod, capex, opex, netAnnualInflow) {
-    // ЧДД
-    const kpiNpv = document.getElementById('kpi-npv');
-    if (kpiNpv) {
-        kpiNpv.innerText = formatCompact(finalNPV);
-        kpiNpv.className = `text-lg font-extrabold mt-1 ${finalNPV >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
-    }
-
+function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, opex, annualInflow, capacity, totalEffect, lifeCycle) {
+    
     // Срок окупаемости
     let paybackPeriod = "Не окуп.";
     for (let i = 0; i < cumulativeData.length; i++) {
@@ -251,33 +246,54 @@ function updateKPIs(finalNPV, cumulativeData, cashFlowsForIRR, discountRate, cal
     const kpiPayback = document.getElementById('kpi-payback');
     if (kpiPayback) kpiPayback.innerText = paybackPeriod;
 
-    // IRR
-    const irrValue = calculate(cashFlowsForIRR);
-    const kpiIrr = document.getElementById('kpi-irr');
-    if (kpiIrr) {
-        kpiIrr.innerText = irrValue !== null ? `${irrValue.toFixed(1)}%` : '—';
+    // ЧДД за расчетный период
+    const npv = npvData[npvData.length - 1] || 0;
+    const kpiNpvPeriod = document.getElementById('kpi-npv-period');
+    if (kpiNpvPeriod) {
+        kpiNpvPeriod.innerText = formatCompact(npv);
+        kpiNpvPeriod.className = `text-lg font-extrabold mt-1 ${npv >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
     }
 
-    // PI (Profitability Index)
-    let totalDiscInflow = 0;
-    let totalDiscOutflow = 0;
-    for (let t = 1; t <= calcPeriod; t++) {
+    // ЧДД за жизненный цикл тренажера
+    let npvLifecycle = 0;
+    for (let t = 1; t <= lifeCycle; t++) {
         const discFactor = 1 / Math.pow(1 + discountRate, t);
-        const outflow = (t === 1) ? capex : opex;
-        const inflow = (t === 1) ? 0 : netAnnualInflow;
-        totalDiscOutflow += outflow * discFactor;
-        totalDiscInflow += (t === 1) ? 0 : (inflow / Math.pow(1 + discountRate, t - 1));
+        let outflow = 0;
+        let inflow = 0;
+        
+        if (t === 1) {
+            outflow = capex;
+            inflow = 0;
+        } else if (t <= lifeCycle) {
+            outflow = opex;
+            inflow = annualInflow;
+        } else {
+            outflow = 0;
+            inflow = 0;
+        }
+        
+        npvLifecycle += (inflow - outflow) * discFactor;
     }
-    const pi = totalDiscOutflow > 0 ? (totalDiscInflow / totalDiscOutflow) : 0;
-    const kpiPi = document.getElementById('kpi-pi');
-    if (kpiPi) {
-        kpiPi.innerText = pi > 0 ? pi.toFixed(2) : '—';
+    
+    const kpiNpvLifecycle = document.getElementById('kpi-npv-lifecycle');
+    if (kpiNpvLifecycle) {
+        kpiNpvLifecycle.innerText = formatCompact(npvLifecycle);
+        kpiNpvLifecycle.className = `text-lg font-extrabold mt-1 ${npvLifecycle >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+    }
+
+    // Эффективность на 1 МВт
+    const efficiency = capacity > 0 ? totalEffect / capacity : 0;
+    const kpiEfficiency = document.getElementById('kpi-efficiency');
+    if (kpiEfficiency) {
+        kpiEfficiency.innerText = formatCompact(efficiency);
+        kpiEfficiency.className = `text-lg font-extrabold mt-1 ${efficiency >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
     }
 }
 
 // 8. Функция обновления графиков (Chart.js)
-function updateCharts(labels, cumulativeData, _structureValues) {
-    // 8.1 Накопленный дисконтированный поток 
+function updateCharts(labels, cumulativeData, structureValues) {
+
+    // График 1: Накопленный дисконтированный поток
     const ctx1 = document.getElementById('cumulativeChart');
     if (ctx1) {
         if (cumulativeChartInstance) {
@@ -328,6 +344,102 @@ function updateCharts(labels, cumulativeData, _structureValues) {
                     y: {
                         grid: { color: '#1e293b' },
                         ticks: { color: '#94a3b8', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // График 2: Удельный экономический эффект
+    const ctx2 = document.getElementById('effectChart');
+    if (ctx2) {
+        if (breakdownChartInstance) {
+            breakdownChartInstance.destroy();
+        }
+
+        // Названия компонентов экономии
+        const effectLabels = [
+            'Восстановительный ремонт',
+            'Экономия топлива на пуски',
+            'Экономия воды',
+            'Экономия электроэнергии',
+            'Оптимизация топлива',
+            'Плановые ремонты',
+            'Потеря прибыли',
+            'Плата за отклонения'
+        ];
+
+        // Данные для графика (в тыс. руб)
+        const effectData = structureValues.map(val => val / 1000);
+
+        breakdownChartInstance = new Chart(ctx2.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: effectLabels,
+                datasets: [{
+                    label: 'Экономия, тыс. руб/год',
+                    data: effectData,
+                    backgroundColor: [
+                        'rgba(255, 125, 26, 0.8)',
+                        'rgba(46, 81, 170, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(236, 72, 153, 0.8)',
+                        'rgba(14, 165, 233, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        '#ff7d1a',
+                        '#2E51AA',
+                        '#10b981',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ec4899',
+                        '#0ea5e9',
+                        '#ef4444'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#131b2e',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function (context) {
+                                return ' ' + formatMoney(context.parsed.y) + ' тыс. руб.';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { 
+                            color: '#94a3b8', 
+                            font: { size: 9 },
+                            maxRotation: 45,
+                            minRotation: 30
+                        }
+                    },
+                    y: {
+                        grid: { color: '#1e293b' },
+                        ticks: { 
+                            color: '#94a3b8', 
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return formatMoney(value) + ' тыс.';
+                            }
+                        }
                     }
                 }
             }
