@@ -229,7 +229,7 @@ function calculate() {
 function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, opex, annualInflow, capacity, totalEffect, lifeCycle) {
     
     // Срок окупаемости
-    let paybackPeriod = "Не окуп.";
+    let paybackPeriod = "Не окупается";
     for (let i = 0; i < cumulativeData.length; i++) {
         if (cumulativeData[i] >= 0) {
             if (i === 0) {
