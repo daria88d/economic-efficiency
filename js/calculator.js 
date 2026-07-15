@@ -11,17 +11,16 @@ let breakdownChartInstance = null;
 function initCalculator() {
     // Находим все элементы ввода
     const inputs = {
-        emergencyShare: document.getElementById('emergency-share'),
+        emergencyShare: document.getElementById('emergency-shutdowns'),
         capacity: document.getElementById('capacity'),
         tariff: document.getElementById('tariff'),
         annualEmergencies: document.getElementById('annual-emergencies'),
         fuelType: document.getElementById('fuel-type'),
         taxRate: document.getElementById('tax-rate'),
         discountRate: document.getElementById('discount-rate'),
-        operatingCostPct: document.getElementById('operating-cost-pct'),
+        operatingCostPct: document.getElementById('operating-costs'),
         calcPeriod: document.getElementById('calc-period'),
-        lifespan: document.getElementById('lifespan'),
-        capex: document.getElementById('capex')
+        lifespan: document.getElementById('life-cycle'),
     };
 
     // Находим кнопку сброса
@@ -47,17 +46,16 @@ function initCalculator() {
 
 // 4. Функция сброса к значениям по умолчанию
 function resetDefaults() {
-    document.getElementById('emergency-share').value = 75;
+    document.getElementById('emergency-shutdowns').value = 75;
     document.getElementById('capacity').value = 300;
     document.getElementById('tariff').value = 4.50;
     document.getElementById('annual-emergencies').value = 3.0;
     document.getElementById('fuel-type').value = 'gas';
     document.getElementById('tax-rate').value = 20;
     document.getElementById('discount-rate').value = 15;
-    document.getElementById('operating-cost-pct').value = 10;
+    document.getElementById('operating-costs').value = 10;
     document.getElementById('calc-period').value = 10;
-    document.getElementById('lifespan').value = 10;
-    document.getElementById('capex').value = 20000;
+    document.getElementById('life-cycle').value = 10;
     calculate();
 }
 
@@ -119,8 +117,8 @@ function calculate() {
 
     // 6.5 Снижение потери прибыли от снижения отпуска электроэнергии
     const shareFuelTariff = 0.53;
-    const profitGrowth = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * (tariff - shareFuelTariff * tariff) 
-    * (1 - taxRate);
+    const profitGrowth = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * (tariff - shareFuelTariff * tariff)
+        * (1 - taxRate);
 
     // 6.6 Снижение платы за отклонения
     const maxTariff = 4513.34;
@@ -128,11 +126,11 @@ function calculate() {
     const cutPayDeviations = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * maxTariff * coefPayDeviations;
 
     // 6.7 Суммарный экономический эффект
-    const totalEffect = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization, 
+    const totalEffect = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization,
         cutCostPlan, profitGrowth, cutPayDeviations].reduce((sum, val) => sum + val, 0);
 
     // 6.8 Обновление интерфейса с результатами расчета эффектов
-    const values = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization, 
+    const values = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization,
         cutCostPlan, profitGrowth, cutPayDeviations];
     values.forEach((val, i) => {
         const valElement = document.getElementById(`val-${i + 1}`);
@@ -152,63 +150,78 @@ function calculate() {
     }
 
     // 6.9 Построение таблицы дисконтированных потоков
+    const capex = 20000.0
+    const opex = (capex * operatingCosts)
+    const annualInflow = totalEffect / 1000;
+
+    const discFactors = []; // коэф-ты дисконтировани
+    const discOutflows = []; // диск. оттоки
+    const discInflows = []; // диск. притоки
+    const discFlows = []; // приведенные диск. потоки
+    const cumulativeDiscFlows = []; // накопленные диск. потоки
+
+    for (let t = 1; t <= calcPeriod; t++) {
+        const discFactor = 1 / Math.pow(1 + discountRate, t);
+        discFactors.push(discFactor);
+
+        let outflow = 0;
+        let inflow = 0;
+
+        if (t === 1) {
+            outflow = capex;
+            inflow = 0;
+        } else if (t <= lifeCycle + 1) {
+            outflow = opex;
+            inflow = annualInflow;
+        } else {
+            outflow = 0;
+            inflow = 0;
+        }
+
+        const discOutflow = outflow * discFactor;
+        const discInflow = inflow * discFactor;
+
+        discOutflows.push(discOutflow);
+        discInflows.push(discInflow);
+
+        const discFlow = discInflow - discOutflow;
+        discFlows.push(discFlow);
+
+        const prevCumulative = cumulativeDiscFlows.length > 0 ? cumulativeDiscFlows[cumulativeDiscFlows.length - 1] : 0;
+        const cumulative = prevCumulative + discFlow;
+        cumulativeDiscFlows.push(cumulative);
+    }
+
     const tableBody = document.getElementById('flow-table-body');
     if (tableBody) {
         tableBody.innerHTML = '';
 
-        let cumulativeFlow = 0;
-        const chartLabels = [];
-        const cumulativeData = [];
-        const cashFlowsForIRR = [];
+        for (let i = 0; i < calcPeriod; i++) {
+            const year = i + 1;
+            const flowColor = discFlows[i] >= 0 ? 'text-emerald-400' : 'text-red-400';
+            const cumColor = cumulativeDiscFlows[i] >= 0 ? 'text-emerald-400' : 'text-red-400';
 
-        for (let t = 1; t <= calcPeriod; t++) {
-            const discFactor = 1 / Math.pow(1 + discountRate, t);
-
-            let outflow = 0;
-            let inflow = 0;
-
-            if (t === 1) {
-                outflow = capex;
-                inflow = 0;
-            } else if (t <= lifespan + 1) {
-                outflow = opex;
-                inflow = netAnnualInflow;
-            }
-
-            const discOutflow = outflow * discFactor;
-            const discInflow = (t === 1) ? 0 : (inflow / Math.pow(1 + discountRate, t - 1));
-            const netDiscountedFlow = discInflow - discOutflow;
-            cumulativeFlow += netDiscountedFlow;
-
-            chartLabels.push(`${t}-год`);
-            cumulativeData.push(cumulativeFlow);
-
-            const realNetFlow = inflow - outflow;
-            cashFlowsForIRR.push(realNetFlow);
-
-            // Создаем строку таблицы
             const row = document.createElement('tr');
             row.className = "hover:bg-brand-dark/80 transition";
-            const flowColor = netDiscountedFlow >= 0 ? 'text-emerald-400' : 'text-red-400';
-            const cumColor = cumulativeFlow >= 0 ? 'text-emerald-400' : 'text-red-400';
 
             row.innerHTML = `
-                <td class="py-3 px-4 font-semibold text-white">${t}-год</td>
-                <td class="py-3 px-4 text-right text-slate-400 font-mono">${discFactor.toFixed(6)}</td>
-                <td class="py-3 px-4 text-right text-red-400 font-mono">${formatMoney(discOutflow)}</td>
-                <td class="py-3 px-4 text-right text-emerald-400 font-mono">${formatMoney(discInflow)}</td>
-                <td class="py-3 px-4 text-right ${flowColor} font-mono">${formatMoney(netDiscountedFlow)}</td>
-                <td class="py-3 px-4 text-right ${cumColor} font-semibold font-mono">${formatMoney(cumulativeFlow)}</td>
-            `;
+            <td class="py-3 px-4 font-semibold text-white">${year}-год</td>
+            <td class="py-3 px-4 text-right text-slate-400 font-mono">${discFactors[i].toFixed(6)}</td>
+            <td class="py-3 px-4 text-right text-red-400 font-mono">${formatMoney(discOutflows[i])}</td>
+            <td class="py-3 px-4 text-right text-emerald-400 font-mono">${formatMoney(discInflows[i])}</td>
+            <td class="py-3 px-4 text-right ${flowColor} font-mono">${formatMoney(discFlows[i])}</td>
+            <td class="py-3 px-4 text-right ${cumColor} font-semibold font-mono">${formatMoney(cumulativeDiscFlows[i])}</td>
+        `;
+
             tableBody.appendChild(row);
         }
-
-        // 6.9 Расчет финансовых показателей
-        updateKPIs(cumulativeFlow, cumulativeData, cashFlowsForIRR, discountRate, calcPeriod, capex, opex, netAnnualInflow);
-
-        // 6.10 Обновление графиков
-        updateCharts(chartLabels, cumulativeData, values);
     }
+
+    // 6.9 Расчет финансовых показателей
+    updateKPIs(cumulativeFlow, cumulativeData, cashFlowsForIRR, discountRate, calcPeriod, capex, opex, annualInflow);
+
+    // 6.10 Обновление графиков
+    updateCharts(chartLabels, cumulativeData, values);
 }
 
 // 7. Функция обновления финансовых показателей
@@ -239,7 +252,7 @@ function updateKPIs(finalNPV, cumulativeData, cashFlowsForIRR, discountRate, cal
     if (kpiPayback) kpiPayback.innerText = paybackPeriod;
 
     // IRR
-    const irrValue = calculateIRR(cashFlowsForIRR);
+    const irrValue = calculate(cashFlowsForIRR);
     const kpiIrr = document.getElementById('kpi-irr');
     if (kpiIrr) {
         kpiIrr.innerText = irrValue !== null ? `${irrValue.toFixed(1)}%` : '—';
@@ -263,7 +276,7 @@ function updateKPIs(finalNPV, cumulativeData, cashFlowsForIRR, discountRate, cal
 }
 
 // 8. Функция обновления графиков (Chart.js)
-function updateCharts(labels, cumulativeData, structureValues) {
+function updateCharts(labels, cumulativeData, _structureValues) {
     // 8.1 Накопленный дисконтированный поток 
     const ctx1 = document.getElementById('cumulativeChart');
     if (ctx1) {
