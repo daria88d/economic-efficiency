@@ -213,7 +213,7 @@ function calculate() {
             const cumColor = cumulativeDiscFlows[i] >= 0 ? 'text-emerald-400' : 'text-red-400';
 
             const row = document.createElement('tr');
-            row.className = "hover:bg-brand-dark/80 transition";
+            row.className = "hover:bg-brand-dark transition";
 
             row.innerHTML = `
             <td class="py-3 px-4 font-semibold text-white">${year}-год</td>
@@ -233,7 +233,7 @@ function calculate() {
 
     // 7.5 Обновление графиков
     const chartLabels = discFactors.map((_, i) => `${i + 1}-год`);
-    updateCharts(chartLabels, cumulativeDiscFlows, values, totalEffect, capacity);
+    updateCharts(chartLabels, cumulativeDiscFlows, totalEffect, capacity);
 }
 
 // 8. Функция обновления финансовых показателей
@@ -302,7 +302,7 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
 }
 
 // 9. Функция обновления графиков (Chart.js)
-function updateCharts(labels, cumulativeData, structureValues, totalEffect, capacity) {
+function updateCharts(labels, cumulativeData, totalEffect, capacity) {
 
     // График 1: Накопленный дисконтированный поток
     const ctx1 = document.getElementById('cumulativeChart');
@@ -318,13 +318,13 @@ function updateCharts(labels, cumulativeData, structureValues, totalEffect, capa
                 datasets: [{
                     label: 'Накопленный поток',
                     data: cumulativeData,
-                    borderColor: '#ff7d1a',
+                    borderColor: '#F69B45',
                     borderWidth: 3,
                     backgroundColor: 'rgba(255, 125, 26, 0.15)',
-                    fill: true,
+                    fill: false,
                     tension: 0.3,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#ff7d1a',
+                    pointBackgroundColor: '#F69B45',
+                    pointBorderColor: '#F69B45',
                     pointHoverRadius: 7,
                     pointRadius: 4
                 }]
@@ -395,9 +395,9 @@ if (ctx2) {
                     data: xData.map((x, i) => ({ x: x, y: yData[i] })),
                     backgroundColor: '#F69B45',
                     borderColor: '#F69B45',
-                    borderWidth: 2,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
                     showLine: true,
                     tension: 0,
                     fill: false,
@@ -408,7 +408,7 @@ if (ctx2) {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: true,
+                        display: false,
                         labels: {
                             color: '#BABBC1',
                             font: { size: 11 }
@@ -440,12 +440,6 @@ if (ctx2) {
                                 return value.toFixed(1);
                             }
                         },
-                        title: {
-                            display: true,
-                            text: 'A · z (произведение аварий и доли вины персонала)',
-                            color: '#BABBC1',
-                            font: { size: 11 }
-                        }
                     },
                     y: {
                         grid: { color: '#1e293b' },
@@ -456,12 +450,6 @@ if (ctx2) {
                                 return formatMoney(value);
                             }
                         },
-                        title: {
-                            display: true,
-                            text: 'Удельный экономический эффект, руб/(год·МВт)',
-                            color: '#BABBC1',
-                            font: { size: 11 }
-                        }
                     }
                 },
                 elements: {
