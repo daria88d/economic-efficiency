@@ -50,7 +50,7 @@ function resetDefaults() {
     document.getElementById('capacity').value = 200;
     document.getElementById('tariff').value = 1486.04;
     document.getElementById('annual-emergencies').value = 2;
-    document.getElementById('fuel-type').value = 'gas';
+    document.getElementById('fuel-type').value = 'oil';
     document.getElementById('tax-rate').value = 0.25;
     document.getElementById('discount-rate').value = 15;
     document.getElementById('operating-costs').value = 10;
@@ -74,32 +74,20 @@ function formatCompact(num) {
     }).format(num);
 }
 
-// 6. ОСНОВНАЯ ФУНКЦИЯ РАСЧЕТА
-function calculate() {
-    // 6.1 Чтение всех входных данных
-    const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
-    const capacity = parseFloat(document.getElementById('capacity').value);
-    const tariff = parseFloat(document.getElementById('tariff').value);
-    const annualEmergencies = parseInt(document.getElementById('annual-emergencies').value);
-    const fuelType = document.getElementById('fuel-type').value;
-    const taxRate = parseFloat(document.getElementById('tax-rate').value);
-    const discountRate = parseFloat(document.getElementById('discount-rate').value) / 100;
-    const operatingCosts = parseFloat(document.getElementById('operating-costs').value) / 100;
-    const calcPeriod = parseInt(document.getElementById('calc-period').value);
-    const lifeCycle = parseInt(document.getElementById('life-cycle').value);
-
-    // 6.2 Цена топлива
+// 6. Универсальная функция расчета эффектов
+function calculateEffects(annualEmergencies, emergencyShutdowns, capacity, tariff, fuelType, taxRate) {
+    // 6.1 Цена топлива
     let fuelCost = 9700.0;
     if (fuelType === 'coal') fuelCost = 18000.0;
     else if (fuelType === 'oil') fuelCost = 36000.0;
 
-    // 6.3 Расчет затрат на проведение восстановительного ремонта
+    // 6.2 Расчет затрат на проведение восстановительного ремонта
     const generationYear = 3062.5 * capacity;
     const shareRepairTariff = 0.05;
     const costPlan = generationYear * tariff * shareRepairTariff;
     const costRenewal = 0.05 * costPlan * annualEmergencies;
 
-    // 6.4 Расчет эффектов
+    // 6.3 Расчет эффектов
     const cutCostRenewal = annualEmergencies * emergencyShutdowns * costRenewal;
     const fuelConsumptionStarting = 599.3;
     const cutFuel = annualEmergencies * emergencyShutdowns * fuelCost * fuelConsumptionStarting;
@@ -115,23 +103,46 @@ function calculate() {
     const cutCostPlanMain = 0.17;
     const cutCostPlan = costPlan * 0.65 * cutCostPlanMain * (1 - emergencyShutdowns);
 
-    // 6.5 Снижение потери прибыли от снижения отпуска электроэнергии
+    // 6.4 Снижение потери прибыли от снижения отпуска электроэнергии
     const shareFuelTariff = 0.53;
     const profitGrowth = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * (tariff - shareFuelTariff * tariff)
         * (1 - taxRate);
 
-    // 6.6 Снижение платы за отклонения
+    // 6.5 Снижение платы за отклонения
     const maxTariff = 4513.34;
     const coefPayDeviations = 2.0;
     const cutPayDeviations = annualEmergencies * emergencyShutdowns * 0.5 * capacity * 24.0 * maxTariff * coefPayDeviations;
 
-    // 6.7 Суммарный экономический эффект
+    // 6.6 Суммарный экономический эффект
     const totalEffect = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization,
         cutCostPlan, profitGrowth, cutPayDeviations].reduce((sum, val) => sum + val, 0);
 
-    // 6.8 Обновление интерфейса с результатами расчета эффектов
-    const values = [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization,
-        cutCostPlan, profitGrowth, cutPayDeviations];
+    return {
+        values: [cutCostRenewal, cutFuel, cutWater, cutEnergy, cutFuelOptimization,
+            cutCostPlan, profitGrowth, cutPayDeviations],
+        totalEffect: totalEffect
+    };
+}
+
+// 7. ОСНОВНАЯ ФУНКЦИЯ РАСЧЕТА
+function calculate() {
+    // 7.1 Чтение всех входных данных
+    const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
+    const capacity = parseFloat(document.getElementById('capacity').value);
+    const tariff = parseFloat(document.getElementById('tariff').value);
+    const annualEmergencies = parseInt(document.getElementById('annual-emergencies').value);
+    const fuelType = document.getElementById('fuel-type').value;
+    const taxRate = parseFloat(document.getElementById('tax-rate').value);
+    const discountRate = parseFloat(document.getElementById('discount-rate').value) / 100;
+    const operatingCosts = parseFloat(document.getElementById('operating-costs').value) / 100;
+    const calcPeriod = parseInt(document.getElementById('calc-period').value);
+    const lifeCycle = parseInt(document.getElementById('life-cycle').value);
+
+    const { values, totalEffect } = calculateEffects(
+        annualEmergencies, emergencyShutdowns, capacity, tariff, fuelType, taxRate
+    );
+
+    // 7.2 Обновление интерфейса с результатами расчета эффектов
     values.forEach((val, i) => {
         const valElement = document.getElementById(`val-${i + 1}`);
         const barElement = document.getElementById(`bar-${i + 1}`);
@@ -149,7 +160,7 @@ function calculate() {
         totalEffectElement.innerText = formatMoney(totalEffect) + ' ₽';
     }
 
-    // 6.9 Построение таблицы дисконтированных потоков
+    // 7.3 Построение таблицы дисконтированных потоков
     const capex = 20000.0
     const opex = (capex * operatingCosts)
     const annualInflow = totalEffect / 1000;
@@ -217,17 +228,17 @@ function calculate() {
         }
     }
 
-    // 6.10 Расчет финансовых показателей
-    updateKPIs(cumulativeDiscFlows, discountRate, calcPeriod, capex, opex, annualInflow, capacity, totalEffect, lifeCycle);
+    // 7.4 Расчет финансовых показателей
+    updateKPIs(cumulativeDiscFlows, discountRate, capex, opex, annualInflow, capacity, totalEffect, lifeCycle);
 
-    // 6.11 Обновление графиков
+    // 7.5 Обновление графиков
     const chartLabels = discFactors.map((_, i) => `${i + 1}-год`);
-    updateCharts(chartLabels, cumulativeDiscFlows);
+    updateCharts(chartLabels, cumulativeDiscFlows, values, totalEffect, capacity);
 }
 
-// 7. Функция обновления финансовых показателей
-function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, opex, annualInflow, capacity, totalEffect, lifeCycle) {
-    
+// 8. Функция обновления финансовых показателей
+function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, capacity, totalEffect, lifeCycle) {
+
     // Срок окупаемости
     let paybackPeriod = "Не окупается";
     for (let i = 0; i < cumulativeData.length; i++) {
@@ -247,7 +258,7 @@ function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, op
     if (kpiPayback) kpiPayback.innerText = paybackPeriod;
 
     // ЧДД за расчетный период
-    const npv = npvData[npvData.length - 1] || 0;
+    const npv = cumulativeData[cumulativeData.length - 1] || 0;
     const kpiNpvPeriod = document.getElementById('kpi-npv-period');
     if (kpiNpvPeriod) {
         kpiNpvPeriod.innerText = formatCompact(npv);
@@ -260,7 +271,7 @@ function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, op
         const discFactor = 1 / Math.pow(1 + discountRate, t);
         let outflow = 0;
         let inflow = 0;
-        
+
         if (t === 1) {
             outflow = capex;
             inflow = 0;
@@ -271,10 +282,10 @@ function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, op
             outflow = 0;
             inflow = 0;
         }
-        
+
         npvLifecycle += (inflow - outflow) * discFactor;
     }
-    
+
     const kpiNpvLifecycle = document.getElementById('kpi-npv-lifecycle');
     if (kpiNpvLifecycle) {
         kpiNpvLifecycle.innerText = formatCompact(npvLifecycle);
@@ -290,8 +301,8 @@ function updateKPIs(cumulativeData, npvData, discountRate, calcPeriod, capex, op
     }
 }
 
-// 8. Функция обновления графиков (Chart.js)
-function updateCharts(labels, cumulativeData, structureValues) {
+// 9. Функция обновления графиков (Chart.js)
+function updateCharts(labels, cumulativeData, structureValues, totalEffect, capacity) {
 
     // График 1: Накопленный дисконтированный поток
     const ctx1 = document.getElementById('cumulativeChart');
@@ -352,62 +363,57 @@ function updateCharts(labels, cumulativeData, structureValues) {
 
     // График 2: Удельный экономический эффект
     const ctx2 = document.getElementById('effectChart');
-    if (ctx2) {
-        if (breakdownChartInstance) {
-            breakdownChartInstance.destroy();
-        }
+if (ctx2) {
+    if (breakdownChartInstance) {
+        breakdownChartInstance.destroy();
+    }
 
-        // Названия компонентов экономии
-        const effectLabels = [
-            'Восстановительный ремонт',
-            'Экономия топлива на пуски',
-            'Экономия воды',
-            'Экономия электроэнергии',
-            'Оптимизация топлива',
-            'Плановые ремонты',
-            'Потеря прибыли',
-            'Плата за отклонения'
-        ];
+    const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
+    const annualEmergencies = parseInt(document.getElementById('annual-emergencies').value);
+    const tariff = parseFloat(document.getElementById('tariff').value);
+    const fuelType = document.getElementById('fuel-type').value;
+    const taxRate = parseFloat(document.getElementById('tax-rate').value);
 
-        // Данные для графика (в тыс. руб)
-        const effectData = structureValues.map(val => val / 1000);
+    const x1 = annualEmergencies * emergencyShutdowns;
+    const y1 = totalEffect / capacity;
+
+    const annualEmergencies2 = annualEmergencies * 2;
+    const result2 = calculateEffects(
+        annualEmergencies2, emergencyShutdowns, capacity, tariff, fuelType, taxRate
+    );
+    const x2 = annualEmergencies2 * emergencyShutdowns;
+    const y2 = result2.totalEffect / capacity;
+
+    const xData = [x1, x2];
+    const yData = [y1, y2];
 
         breakdownChartInstance = new Chart(ctx2.getContext('2d'), {
-            type: 'bar',
+            type: 'scatter',
             data: {
-                labels: effectLabels,
                 datasets: [{
-                    label: 'Экономия, тыс. руб/год',
-                    data: effectData,
-                    backgroundColor: [
-                        'rgba(255, 125, 26, 0.8)',
-                        'rgba(46, 81, 170, 0.8)',
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(245, 158, 11, 0.8)',
-                        'rgba(139, 92, 246, 0.8)',
-                        'rgba(236, 72, 153, 0.8)',
-                        'rgba(14, 165, 233, 0.8)',
-                        'rgba(239, 68, 68, 0.8)'
-                    ],
-                    borderColor: [
-                        '#ff7d1a',
-                        '#2E51AA',
-                        '#10b981',
-                        '#f59e0b',
-                        '#8b5cf6',
-                        '#ec4899',
-                        '#0ea5e9',
-                        '#ef4444'
-                    ],
+                    label: 'Удельный экономический эффект',
+                    data: xData.map((x, i) => ({ x: x, y: yData[i] })),
+                    backgroundColor: '#F69B45',
+                    borderColor: '#F69B45',
                     borderWidth: 2,
-                    borderRadius: 4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    showLine: true,
+                    tension: 0,
+                    fill: false,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#BABBC1',
+                            font: { size: 11 }
+                        }
+                    },
                     tooltip: {
                         backgroundColor: '#131b2e',
                         titleColor: '#fff',
@@ -416,30 +422,52 @@ function updateCharts(labels, cumulativeData, structureValues) {
                         borderWidth: 1,
                         callbacks: {
                             label: function (context) {
-                                return ' ' + formatMoney(context.parsed.y) + ' тыс. руб.';
+                                const point = context.parsed;
+                                return `A·z: ${point.x.toFixed(2)}, Эуд: ${formatMoney(point.y)} руб/(год·МВт)`;
                             }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        grid: { display: false },
-                        ticks: { 
-                            color: '#94a3b8', 
-                            font: { size: 9 },
-                            maxRotation: 45,
-                            minRotation: 30
+                        type: 'linear',
+                        position: 'bottom',
+                        grid: { color: '#1e293b' },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 10 },
+                            callback: function (value) {
+                                return value.toFixed(1);
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'A · z (произведение аварий и доли вины персонала)',
+                            color: '#BABBC1',
+                            font: { size: 11 }
                         }
                     },
                     y: {
                         grid: { color: '#1e293b' },
-                        ticks: { 
-                            color: '#94a3b8', 
+                        ticks: {
+                            color: '#94a3b8',
                             font: { size: 10 },
-                            callback: function(value) {
-                                return formatMoney(value) + ' тыс.';
+                            callback: function (value) {
+                                return formatMoney(value);
                             }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Удельный экономический эффект, руб/(год·МВт)',
+                            color: '#BABBC1',
+                            font: { size: 11 }
                         }
+                    }
+                },
+                elements: {
+                    line: {
+                        borderColor: '#F69B45',
+                        borderWidth: 2,
                     }
                 }
             }

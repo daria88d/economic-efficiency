@@ -130,9 +130,9 @@
                         </label>
                         <select id="fuel-type"
                             class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
-                            <option value="gas" selected>Природный газ</option>
+                            <option value="gas">Природный газ</option>
                             <option value="coal">Каменный уголь</option>
-                            <option value="oil">Мазут</option>
+                            <option value="oil" selected>Мазут</option>
                         </select>
                     </div>
 
@@ -183,17 +183,6 @@
                         <input type="number" id="life-cycle" value="10" 
                             class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                     </div>
-
-                    <!-- Рассчитать -->
-                    <button type="submit"
-                        class="w-full mt-6 bg-brand-blue hover:bg-brand-blueHover text-white py-3.5 px-6 rounded-xl font-bold uppercase tracking-wider flex items-center justify-center space-x-2 transition shadow-lg hover:shadow-brand-blue/30 active:scale-[0.98]">
-                        <span>Рассчитать</span>
-                        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </button>
 
                     <button type="button" onclick="resetDefaults()" id="reset-btn"
                         class="mt-6 w-full text-xs text-brand-slate hover:text-white transition py-1 text-center">
