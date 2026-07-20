@@ -157,7 +157,7 @@ function calculate() {
 
     const totalEffectElement = document.getElementById('total-effect');
     if (totalEffectElement) {
-        totalEffectElement.innerText = formatMoney(totalEffect) + ' ₽';
+        totalEffectElement.innerText = formatMoney(totalEffect);
     }
 
     // 7.3 Построение таблицы дисконтированных потоков
@@ -209,16 +209,16 @@ function calculate() {
 
         for (let i = 0; i < calcPeriod; i++) {
             const year = i + 1;
-            const flowColor = discFlows[i] >= 0 ? 'text-emerald-400' : 'text-red-400';
-            const cumColor = cumulativeDiscFlows[i] >= 0 ? 'text-emerald-400' : 'text-red-400';
+            const flowColor = discFlows[i] >= 0 ? 'text-emerald-400' : 'text-[#E55A6B]';
+            const cumColor = cumulativeDiscFlows[i] >= 0 ? 'text-emerald-400' : 'text-[#E55A6B]';
 
             const row = document.createElement('tr');
             row.className = "hover:bg-brand-dark transition";
 
             row.innerHTML = `
-            <td class="py-3 px-4 font-semibold text-white">${year}-год</td>
-            <td class="py-3 px-4 text-right text-slate-400 font-mono">${discFactors[i].toFixed(6)}</td>
-            <td class="py-3 px-4 text-right text-red-400 font-mono">${formatMoney(discOutflows[i])}</td>
+            <td class="py-3 px-4 font-semibold text-white">${year}-й</td>
+            <td class="py-3 px-4 text-right text-[#BABBC1] font-mono">${discFactors[i].toFixed(6)}</td>
+            <td class="py-3 px-4 text-right text-[#E55A6B] font-mono">${formatMoney(discOutflows[i])}</td>
             <td class="py-3 px-4 text-right text-emerald-400 font-mono">${formatMoney(discInflows[i])}</td>
             <td class="py-3 px-4 text-right ${flowColor} font-mono">${formatMoney(discFlows[i])}</td>
             <td class="py-3 px-4 text-right ${cumColor} font-semibold font-mono">${formatMoney(cumulativeDiscFlows[i])}</td>
@@ -244,12 +244,12 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
     for (let i = 0; i < cumulativeData.length; i++) {
         if (cumulativeData[i] >= 0) {
             if (i === 0) {
-                paybackPeriod = "1 год";
+                paybackPeriod = "1";
             } else {
                 const prevVal = cumulativeData[i - 1];
                 const currVal = cumulativeData[i];
                 const fraction = Math.abs(prevVal) / (currVal - prevVal);
-                paybackPeriod = `${(i + fraction).toFixed(1)} лет`;
+                paybackPeriod = `${(i + fraction).toFixed(1)}`;
             }
             break;
         }
@@ -262,7 +262,7 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
     const kpiNpvPeriod = document.getElementById('kpi-npv-period');
     if (kpiNpvPeriod) {
         kpiNpvPeriod.innerText = formatCompact(npv);
-        kpiNpvPeriod.className = `text-lg font-extrabold mt-1 ${npv >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+        kpiNpvPeriod.className = `text-lg font-extrabold mt-1 ${npv >= 0 ? 'text-white' : 'text-[#E55A6B]'}`;
     }
 
     // ЧДД за жизненный цикл тренажера
@@ -289,7 +289,7 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
     const kpiNpvLifecycle = document.getElementById('kpi-npv-lifecycle');
     if (kpiNpvLifecycle) {
         kpiNpvLifecycle.innerText = formatCompact(npvLifecycle);
-        kpiNpvLifecycle.className = `text-lg font-extrabold mt-1 ${npvLifecycle >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+        kpiNpvLifecycle.className = `text-lg font-extrabold mt-1 ${npvLifecycle >= 0 ? 'text-white' : 'text-[#E55A6B]'}`;
     }
 
     // Эффективность на 1 МВт
@@ -297,7 +297,7 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
     const kpiEfficiency = document.getElementById('kpi-efficiency');
     if (kpiEfficiency) {
         kpiEfficiency.innerText = formatCompact(efficiency);
-        kpiEfficiency.className = `text-lg font-extrabold mt-1 ${efficiency >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+        kpiEfficiency.className = `text-lg font-extrabold mt-1 ${efficiency >= 0 ? 'text-white' : 'text-[#E55A6B]'}`;
     }
 }
 
