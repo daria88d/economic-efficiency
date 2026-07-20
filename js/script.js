@@ -249,7 +249,8 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
                 const prevVal = cumulativeData[i - 1];
                 const currVal = cumulativeData[i];
                 const fraction = Math.abs(prevVal) / (currVal - prevVal);
-                paybackPeriod = `${(i + fraction).toFixed(1)}`;
+                const value = i + fraction;
+                paybackPeriod = formatCompact(value);
             }
             break;
         }
@@ -320,7 +321,6 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                     data: cumulativeData,
                     borderColor: '#F69B45',
                     borderWidth: 3,
-                    backgroundColor: 'rgba(255, 125, 26, 0.15)',
                     fill: false,
                     tension: 0.3,
                     pointBackgroundColor: '#F69B45',
@@ -335,10 +335,10 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#131b2e',
-                        titleColor: '#fff',
-                        bodyColor: '#cbd5e1',
-                        borderColor: '#334155',
+                        backgroundColor: '#232842',
+                        titleColor: '#BABBC1',
+                        bodyColor: '#BABBC1',
+                        borderColor: '#2E51AA',
                         borderWidth: 1,
                         callbacks: {
                             label: function (context) {
@@ -349,12 +349,12 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                 },
                 scales: {
                     x: {
-                        grid: { color: '#1e293b' },
-                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                        grid: { color: '#232842' },
+                        ticks: { color: '#BABBC1', font: { size: 10 } }
                     },
                     y: {
-                        grid: { color: '#1e293b' },
-                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                        grid: { color: '#232842' },
+                        ticks: { color: '#BABBC1', font: { size: 10 } }
                     }
                 }
             }
@@ -415,10 +415,10 @@ if (ctx2) {
                         }
                     },
                     tooltip: {
-                        backgroundColor: '#131b2e',
-                        titleColor: '#fff',
-                        bodyColor: '#cbd5e1',
-                        borderColor: '#334155',
+                        backgroundColor: '#232842',
+                        titleColor: '#BABBC1',
+                        bodyColor: '#BABBC1',
+                        borderColor: '#2E51AA',
                         borderWidth: 1,
                         callbacks: {
                             label: function (context) {
@@ -432,9 +432,9 @@ if (ctx2) {
                     x: {
                         type: 'linear',
                         position: 'bottom',
-                        grid: { color: '#1e293b' },
+                        grid: { color: '#232842' },
                         ticks: {
-                            color: '#94a3b8',
+                            color: '#BABBC1',
                             font: { size: 10 },
                             callback: function (value) {
                                 return value.toFixed(1);
@@ -442,9 +442,9 @@ if (ctx2) {
                         },
                     },
                     y: {
-                        grid: { color: '#1e293b' },
+                        grid: { color: '#232842' },
                         ticks: {
-                            color: '#94a3b8',
+                            color: '#BABBC1',
                             font: { size: 10 },
                             callback: function (value) {
                                 return formatMoney(value);
