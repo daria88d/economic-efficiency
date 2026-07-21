@@ -150,7 +150,7 @@ function validateInputs() {
             continue;
         }
 
-          if (field.integer && !Number.isInteger(value)) {
+        if (field.integer && !Number.isInteger(value)) {
             showFieldError(element, `Допускаются только целочисленные значения`);
             isValid = false;
             continue;
@@ -200,7 +200,7 @@ function calculate() {
 
     // 8.1 Валидация входных данных
     if (!validateInputs()) {
-        return; 
+        return;
     }
 
     // 8.2 Чтение всех входных данных
@@ -293,12 +293,12 @@ function calculate() {
             row.className = "hover:bg-brand-dark transition";
 
             row.innerHTML = `
-            <td class="py-3 px-4 font-semibold text-white">${year}-й</td>
-            <td class="py-3 px-4 text-right text-[#BABBC1] font-mono">${discFactors[i].toFixed(6)}</td>
-            <td class="py-3 px-4 text-right text-[#E55A6B] font-mono">${formatMoney(discOutflows[i])}</td>
-            <td class="py-3 px-4 text-right text-emerald-400 font-mono">${formatMoney(discInflows[i])}</td>
-            <td class="py-3 px-4 text-right ${flowColor} font-mono">${formatMoney(discFlows[i])}</td>
-            <td class="py-3 px-4 text-right ${cumColor} font-semibold font-mono">${formatMoney(cumulativeDiscFlows[i])}</td>
+            <td class="py-3 px-4 text-[#BABBC1] text-[16px] font-semibold font-sans">${year}-й</td>
+            <td class="py-3 px-4 text-right text-[#BABBC1] text-[16px] font-semibold font-sans">${discFactors[i].toFixed(6)}</td>
+            <td class="py-3 px-4 text-right text-[#E55A6B] text-[16px] font-semibold font-sans">${formatMoney(discOutflows[i])}</td>
+            <td class="py-3 px-4 text-right text-emerald-400 text-[16px] font-semibold font-sans">${formatMoney(discInflows[i])}</td>
+            <td class="py-3 px-4 text-right ${flowColor} text-[16px] font-semibold font-sans">${formatMoney(discFlows[i])}</td>
+            <td class="py-3 px-4 text-right ${cumColor} text-[16px] font-semibold font-sans">${formatMoney(cumulativeDiscFlows[i])}</td>
         `;
 
             tableBody.appendChild(row);
@@ -417,6 +417,12 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                         bodyColor: '#BABBC1',
                         borderColor: '#2E51AA',
                         borderWidth: 1,
+                        titleFont: {
+                            family: "'Fira Sans', 'sans-serif'"
+                        },
+                        bodyFont: {
+                            family: "'Fira Sans', 'sans-serif'"
+                        },
                         callbacks: {
                             label: function (context) {
                                 return ' ' + formatMoney(context.parsed.y) + ' тыс. руб.';
@@ -427,11 +433,13 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                 scales: {
                     x: {
                         grid: { color: '#232842' },
-                        ticks: { color: '#BABBC1', font: { size: 10 } }
+                        ticks: { color: '#BABBC1', 
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" } }
                     },
                     y: {
                         grid: { color: '#232842' },
-                        ticks: { color: '#BABBC1', font: { size: 10 } }
+                        ticks: { color: '#BABBC1', 
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" } }
                     }
                 }
             }
@@ -440,29 +448,29 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
 
     // График 2: Удельный экономический эффект
     const ctx2 = document.getElementById('effectChart');
-if (ctx2) {
-    if (breakdownChartInstance) {
-        breakdownChartInstance.destroy();
-    }
+    if (ctx2) {
+        if (breakdownChartInstance) {
+            breakdownChartInstance.destroy();
+        }
 
-    const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
-    const annualEmergencies = parseInt(document.getElementById('annual-emergencies').value);
-    const tariff = parseFloat(document.getElementById('tariff').value);
-    const fuelType = document.getElementById('fuel-type').value;
-    const taxRate = parseFloat(document.getElementById('tax-rate').value);
+        const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
+        const annualEmergencies = parseInt(document.getElementById('annual-emergencies').value);
+        const tariff = parseFloat(document.getElementById('tariff').value);
+        const fuelType = document.getElementById('fuel-type').value;
+        const taxRate = parseFloat(document.getElementById('tax-rate').value);
 
-    const x1 = annualEmergencies * emergencyShutdowns;
-    const y1 = totalEffect / capacity;
+        const x1 = annualEmergencies * emergencyShutdowns;
+        const y1 = totalEffect / capacity;
 
-    const annualEmergencies2 = annualEmergencies * 2;
-    const result2 = calculateEffects(
-        annualEmergencies2, emergencyShutdowns, capacity, tariff, fuelType, taxRate
-    );
-    const x2 = annualEmergencies2 * emergencyShutdowns;
-    const y2 = result2.totalEffect / capacity;
+        const annualEmergencies2 = annualEmergencies * 2;
+        const result2 = calculateEffects(
+            annualEmergencies2, emergencyShutdowns, capacity, tariff, fuelType, taxRate
+        );
+        const x2 = annualEmergencies2 * emergencyShutdowns;
+        const y2 = result2.totalEffect / capacity;
 
-    const xData = [x1, x2];
-    const yData = [y1, y2];
+        const xData = [x1, x2];
+        const yData = [y1, y2];
 
         breakdownChartInstance = new Chart(ctx2.getContext('2d'), {
             type: 'scatter',
@@ -484,19 +492,19 @@ if (ctx2) {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false,
-                        labels: {
-                            color: '#BABBC1',
-                            font: { size: 11 }
-                        }
-                    },
+                    legend: { display: false },
                     tooltip: {
                         backgroundColor: '#232842',
                         titleColor: '#BABBC1',
                         bodyColor: '#BABBC1',
                         borderColor: '#2E51AA',
                         borderWidth: 1,
+                        titleFont: {
+                            family: "'Fira Sans', 'sans-serif'"
+                        },
+                        bodyFont: {
+                            family: "'Fira Sans', 'sans-serif'"
+                        },
                         callbacks: {
                             label: function (context) {
                                 const point = context.parsed;
@@ -512,7 +520,7 @@ if (ctx2) {
                         grid: { color: '#232842' },
                         ticks: {
                             color: '#BABBC1',
-                            font: { size: 10 },
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" },
                             callback: function (value) {
                                 return value.toFixed(1);
                             }
@@ -522,7 +530,7 @@ if (ctx2) {
                         grid: { color: '#232842' },
                         ticks: {
                             color: '#BABBC1',
-                            font: { size: 10 },
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" },
                             callback: function (value) {
                                 return formatMoney(value);
                             }
