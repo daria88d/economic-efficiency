@@ -93,7 +93,7 @@
                                 for="emergency-shutdowns">
                                 Доля аварийных остановов по вине персонала
                             </label>
-                            <input type="number" id="emergency-shutdowns" value="0.4"
+                            <input type="number" id="emergency-shutdowns" value="0.4" min="0" max="1.0" step="0.1" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -103,7 +103,7 @@
                                 for="capacity">
                                 Установленная мощность блока, МВт
                             </label>
-                            <input type="number" id="capacity" value="200"
+                            <input type="number" id="capacity" value="200" min="0" step="100.0" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -113,7 +113,7 @@
                                 for="tariff">
                                 Тарифная ставка за электроэнергию, руб/(МВт⋅ч)
                             </label>
-                            <input type="number" id="tariff" value="1486.04"
+                            <input type="number" id="tariff" value="1486.04" min="0" step="100.0" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -123,7 +123,7 @@
                                 for="annual-emergencies">
                                 Среднегодовое количество аварийных остановов блока по вине персонала
                             </label>
-                            <input type="number" id="annual-emergencies" value="2"
+                            <input type="number" id="annual-emergencies" value="2" min="0" step="1.0" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -147,7 +147,7 @@
                                 for="tax-rate">
                                 Ставка налога на прибыль
                             </label>
-                            <input type="number" id="tax-rate" value="0.25"
+                            <input type="number" id="tax-rate" value="0.25" min="0" max="1.0" step="0.1" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -157,7 +157,7 @@
                                 for="discount-rate">
                                 Ставка дисконта, %
                             </label>
-                            <input type="number" id="discount-rate" value="15"
+                            <input type="number" id="discount-rate" value="15" min="0" max="100.0" step="10.0" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -167,7 +167,7 @@
                                 for="operating-costs">
                                 Процент на последующие эксплуатационные затраты, % от разработки
                             </label>
-                            <input type="number" id="operating-costs" value="10"
+                            <input type="number" id="operating-costs" value="10" min="0" max="100.0" step="10.0" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -177,7 +177,7 @@
                                 for="calc-period">
                                 Расчетный период, лет
                             </label>
-                            <input type="number" id="calc-period" value="6"
+                            <input type="number" id="calc-period" value="6" min="1" max="15.0" step="1" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
 
@@ -187,7 +187,7 @@
                                 for="life-cycle">
                                 Жизненный цикл тренажера, лет
                             </label>
-                            <input type="number" id="life-cycle" value="10"
+                            <input type="number" id="life-cycle" value="10" min="1" step="1" required
                                 class="w-full bg-brand-dark border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent transition font-semibold">
                         </div>
                     </div>

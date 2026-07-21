@@ -124,9 +124,86 @@ function calculateEffects(annualEmergencies, emergencyShutdowns, capacity, tarif
     };
 }
 
-// 7. ОСНОВНАЯ ФУНКЦИЯ РАСЧЕТА
+// 7. Функция валидации 
+function validateInputs() {
+    const fields = [
+        { id: 'emergency-shutdowns', name: 'Доля аварийных остановов по вине персонала', min: 0, max: 1.0 },
+        { id: 'capacity', name: 'Установленная мощность блока, МВт', min: 0 },
+        { id: 'tariff', name: 'Тарифная ставка за электроэнергию, руб/(МВт⋅ч)', min: 0 },
+        { id: 'annual-emergencies', name: 'Среднегодовое количество аварийных остановов блока по вине персонала', min: 0, integer: true },
+        { id: 'tax-rate', name: 'Ставка налога на прибыль', min: 0, max: 1.0 },
+        { id: 'discount-rate', name: 'Ставка дисконта, %', min: 0, max: 100 },
+        { id: 'operating-costs', name: 'Процент на последующие эксплуатационные затраты, % от разработки', min: 0, max: 100 },
+        { id: 'calc-period', name: 'Расчетный период, лет', min: 1, max: 15, integer: true },
+        { id: 'life-cycle', name: 'Жизненный цикл тренажера, лет', min: 1, integer: true }
+    ];
+
+    let isValid = true;
+
+    for (const field of fields) {
+        const element = document.getElementById(field.id);
+        const value = parseFloat(element.value);
+
+        if (isNaN(value) || element.value.trim() === '') {
+            showFieldError(element, `Введите значение`);
+            isValid = false;
+            continue;
+        }
+
+          if (field.integer && !Number.isInteger(value)) {
+            showFieldError(element, `Допускаются только целочисленные значения`);
+            isValid = false;
+            continue;
+        }
+
+        if (field.min !== undefined && value < field.min) {
+            showFieldError(element, `Значение должно быть ≥ ${field.min}`);
+            isValid = false;
+            continue;
+        }
+
+        if (field.max !== undefined && value > field.max) {
+            showFieldError(element, `Значение должно быть ≤ ${field.max}`);
+            isValid = false;
+            continue;
+        }
+
+        clearFieldError(element);
+    }
+
+    return isValid;
+}
+
+function showFieldError(element, message) {
+    element.classList.add('border-[#E55A6B]', 'focus:border-[#E55A6B]');
+    element.classList.remove('border-slate-700', 'focus:border-brand-accent');
+
+    const existingError = element.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message text-[#E55A6B] text-xs mt-1';
+    errorDiv.textContent = message;
+    element.parentElement.appendChild(errorDiv);
+}
+
+function clearFieldError(element) {
+    element.classList.remove('border-[#E55A6B]', 'focus:border-[#E55A6B]');
+    element.classList.add('border-slate-700', 'focus:border-brand-accent');
+
+    const existingError = element.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+}
+
+// 8. ОСНОВНАЯ ФУНКЦИЯ РАСЧЕТА
 function calculate() {
-    // 7.1 Чтение всех входных данных
+
+    // 8.1 Валидация входных данных
+    if (!validateInputs()) {
+        return; 
+    }
+
+    // 8.2 Чтение всех входных данных
     const emergencyShutdowns = parseFloat(document.getElementById('emergency-shutdowns').value);
     const capacity = parseFloat(document.getElementById('capacity').value);
     const tariff = parseFloat(document.getElementById('tariff').value);
@@ -142,7 +219,7 @@ function calculate() {
         annualEmergencies, emergencyShutdowns, capacity, tariff, fuelType, taxRate
     );
 
-    // 7.2 Обновление интерфейса с результатами расчета эффектов
+    // 8.3 Обновление интерфейса с результатами расчета эффектов
     values.forEach((val, i) => {
         const valElement = document.getElementById(`val-${i + 1}`);
         const barElement = document.getElementById(`bar-${i + 1}`);
@@ -160,7 +237,7 @@ function calculate() {
         totalEffectElement.innerText = formatMoney(totalEffect);
     }
 
-    // 7.3 Построение таблицы дисконтированных потоков
+    // 8.4 Построение таблицы дисконтированных потоков
     const capex = 20000.0
     const opex = (capex * operatingCosts)
     const annualInflow = totalEffect / 1000;
@@ -228,15 +305,15 @@ function calculate() {
         }
     }
 
-    // 7.4 Расчет финансовых показателей
+    // 8.5 Расчет финансовых показателей
     updateKPIs(cumulativeDiscFlows, discountRate, capex, opex, annualInflow, capacity, totalEffect, lifeCycle);
 
-    // 7.5 Обновление графиков
+    // 8.6 Обновление графиков
     const chartLabels = discFactors.map((_, i) => `${i + 1}-год`);
     updateCharts(chartLabels, cumulativeDiscFlows, totalEffect, capacity);
 }
 
-// 8. Функция обновления финансовых показателей
+// 9. Функция обновления финансовых показателей
 function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, capacity, totalEffect, lifeCycle) {
 
     // Срок окупаемости
@@ -302,7 +379,7 @@ function updateKPIs(cumulativeData, discountRate, capex, opex, annualInflow, cap
     }
 }
 
-// 9. Функция обновления графиков (Chart.js)
+// 10. Функция обновления графиков (Chart.js)
 function updateCharts(labels, cumulativeData, totalEffect, capacity) {
 
     // График 1: Накопленный дисконтированный поток
