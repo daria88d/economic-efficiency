@@ -294,7 +294,7 @@ function calculate() {
 
             row.innerHTML = `
             <td class="py-3 px-4 text-[#BABBC1] text-[16px] font-semibold font-sans">${year}-й</td>
-            <td class="py-3 px-4 text-right text-[#BABBC1] text-[16px] font-semibold font-sans">${discFactors[i].toFixed(6)}</td>
+            <td class="py-3 px-4 text-right text-[#BABBC1] text-[16px] font-semibold font-sans">${discFactors[i].toFixed(2).replace('.', ',')}</td>
             <td class="py-3 px-4 text-right text-[#E55A6B] text-[16px] font-semibold font-sans">${formatMoney(discOutflows[i])}</td>
             <td class="py-3 px-4 text-right text-emerald-400 text-[16px] font-semibold font-sans">${formatMoney(discInflows[i])}</td>
             <td class="py-3 px-4 text-right ${flowColor} text-[16px] font-semibold font-sans">${formatMoney(discFlows[i])}</td>
@@ -424,8 +424,10 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                             family: "'Fira Sans', 'sans-serif'"
                         },
                         callbacks: {
+                            color: '#BABBC1',
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" },
                             label: function (context) {
-                                return ' ' + formatMoney(context.parsed.y) + ' тыс. руб.';
+                                return ' ' + formatMoney(context.parsed.y) + ' тыс. руб';
                             }
                         }
                     }
@@ -433,13 +435,17 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                 scales: {
                     x: {
                         grid: { color: '#232842' },
-                        ticks: { color: '#BABBC1', 
-                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" } }
+                        ticks: {
+                            color: '#BABBC1',
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" }
+                        }
                     },
                     y: {
                         grid: { color: '#232842' },
-                        ticks: { color: '#BABBC1', 
-                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" } }
+                        ticks: {
+                            color: '#BABBC1',
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" }
+                        }
                     }
                 }
             }
@@ -472,9 +478,15 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
         const xData = [x1, x2];
         const yData = [y1, y2];
 
+        const labels = [
+            `A·z = ${x1.toFixed(1).replace('.', ',')}`,
+            `A·z = ${x2.toFixed(1).replace('.', ',')}`
+        ];
+
         breakdownChartInstance = new Chart(ctx2.getContext('2d'), {
             type: 'scatter',
             data: {
+                labels: labels,
                 datasets: [{
                     label: 'Удельный экономический эффект',
                     data: xData.map((x, i) => ({ x: x, y: yData[i] })),
@@ -506,9 +518,10 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                             family: "'Fira Sans', 'sans-serif'"
                         },
                         callbacks: {
+                            color: '#BABBC1',
+                            font: { size: 12, family: "'Fira Sans', 'sans-serif'" },
                             label: function (context) {
-                                const point = context.parsed;
-                                return `A·z: ${point.x.toFixed(2)}, Эуд: ${formatMoney(point.y)} руб/(год·МВт)`;
+                                return ' ' + formatMoney(context.parsed.y) + ' руб/(год·МВт)';
                             }
                         }
                     }
@@ -522,7 +535,7 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                             color: '#BABBC1',
                             font: { size: 12, family: "'Fira Sans', 'sans-serif'" },
                             callback: function (value) {
-                                return value.toFixed(1);
+                                return value.toFixed(1).replace('.', ',');
                             }
                         },
                     },
@@ -532,7 +545,7 @@ function updateCharts(labels, cumulativeData, totalEffect, capacity) {
                             color: '#BABBC1',
                             font: { size: 12, family: "'Fira Sans', 'sans-serif'" },
                             callback: function (value) {
-                                return formatMoney(value);
+                                return formatCompact(value);
                             }
                         },
                     }
