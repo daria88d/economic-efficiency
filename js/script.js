@@ -1,6 +1,19 @@
 // 1. Ожидание загрузки DOM
 document.addEventListener('DOMContentLoaded', function () {
     initCalculator();
+    const chatDetails = document.querySelector('details.fixed.bottom-6.right-6');
+    if (chatDetails) {
+        document.addEventListener('click', function (e) {
+            if (chatDetails.open && !chatDetails.contains(e.target)) {
+                chatDetails.open = false;
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && chatDetails.open) {
+                chatDetails.open = false;
+            }
+        });
+    }
 });
 
 // 2. Глобальные переменные для графиков
